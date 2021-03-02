@@ -1,0 +1,62 @@
+$levels: 0, 1, 2, 3, 4;
+$toggle_width: 12px;
+
+body {
+  margin: unset;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+.treeview {
+  padding: 24px 0;
+
+  &__block--active {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.item {
+  &__wrapper {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  &__toggle {
+    width: $toggle_width;
+    text-align: right;
+    display: inline-block;
+    transition: transform 0.5s;
+    cursor: pointer;
+  }
+
+  &__title--active {
+    font-weight: bold;
+  }
+
+  &__toggle--active {
+    transform: rotate(90deg);
+  }
+  &__title {
+    padding-left: 4px;
+    cursor: pointer;
+  }
+
+  @each $level in $levels {
+    &-level-#{$level} {
+      padding-left: #{$level * 16px + 32px};
+    }
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: 0.2s;
+  }
+}
+
+@each $level in $levels {
+  .leaf-level-#{$level} {
+    padding-left: #{$level * 16px + 32px + $toggle_width};
+  }
+}
