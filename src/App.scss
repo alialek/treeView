@@ -1,5 +1,15 @@
 $levels: 0, 1, 2, 3, 4;
 $toggle_width: 12px;
+$line_width: 216px;
+$level_padding: 16px;
+
+@mixin nth-children($lines...) {
+  @each $line in $lines {
+    &:nth-child(#{$line}) {
+      @content;
+    }
+  }
+}
 
 body {
   margin: unset;
@@ -11,6 +21,47 @@ html {
 
 .treeview {
   padding: 24px 0;
+  width: 280px;
+
+  &__loading {
+    margin: 0 20px;
+    border-radius: 4px;
+    width: 100%;
+
+    &--line {
+      height: 16px;
+      margin: $level_padding;
+      animation: pulse 1s infinite;
+    }
+
+    div {
+      @include nth-children(1, 9, 10) {
+        width: $line_width;
+      }
+      @include nth-children(2, 3, 4) {
+        margin-left: #{$level_padding * 2};
+      }
+      @include nth-children(5, 6, 7, 8) {
+        margin-left: #{$level_padding * 3};
+      }
+      @include nth-children(2, 4) {
+        width: #{$line_width * 0.8};
+      }
+      @include nth-children(3) {
+        width: #{$line_width * 0.9};
+      }
+      @include nth-children(5, 7) {
+        width: #{$line_width * 0.8};
+      }
+      @include nth-children(6, 8) {
+        width: #{$line_width * 0.7};
+      }
+    }
+  }
+
+  &__block {
+    animation: reveal 0.2s ease-in-out;
+  }
 
   &__block--active {
     background-color: rgba(0, 0, 0, 0.1);
@@ -21,13 +72,16 @@ html {
   &__wrapper {
     padding-top: 8px;
     padding-bottom: 8px;
+    display: flex;
   }
 
   &__toggle {
     width: $toggle_width;
+    height: 17px;
+    font-size: 17px;
     text-align: right;
-    display: inline-block;
-    transition: transform 0.5s;
+    display: block;
+    transition: transform 0.2s;
     cursor: pointer;
   }
 
@@ -45,7 +99,7 @@ html {
 
   @each $level in $levels {
     &-level-#{$level} {
-      padding-left: #{$level * 16px + 32px};
+      padding-left: #{$level * $level_padding + 32px};
     }
   }
 
@@ -58,5 +112,26 @@ html {
 @each $level in $levels {
   .leaf-level-#{$level} {
     padding-left: #{$level * 16px + 32px + $toggle_width};
+  }
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes reveal {
+  0% {
+    max-height: 0px;
+  }
+  100% {
+    max-height: 500px;
   }
 }

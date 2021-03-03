@@ -8,15 +8,22 @@ const TreeBranch = ({
   opennedBranches,
   changeActiveItem,
   changeBranchView,
+  handleKeyboard,
 }) => {
+  console.log(page.id);
   const { id, title, url, level, parentId, pages, anchors } = page;
   const isLeaf = useMemo(() => !pages?.length, [pages]);
   const isActive = useMemo(() => id === active, [id, active]);
+
   return (
     <div
       className={`treeview__block ${isActive ? "treeview__block--active" : ""}`}
     >
-      <div className={`treeview__item item`}>
+      <div
+        tabIndex="0 "
+        onKeyDown={(e) => handleKeyboard(id, e)}
+        className={`treeview__item item`}
+      >
         <div
           className={`${
             isLeaf ? "leaf" : "item"
@@ -32,42 +39,46 @@ const TreeBranch = ({
               ▸
             </span>
           )}
-          <span
+          <div
             onClick={() => changeActiveItem(id)}
             className={`item__title ${isActive ? "item__title--active" : ""}`}
           >
             {title}
-          </span>
+          </div>
         </div>
       </div>
-      <div>
-        {opennedBranches.includes(id) &&
-          pages.map((page) => (
-            <TreeBranch
-              changeActiveItem={changeActiveItem}
-              changeBranchView={changeBranchView}
-              active={active}
-              opennedBranches={opennedBranches}
-              data={data}
-              key={page}
-              page={data.entities.pages[page]}
-            />
-          ))}
-        {isActive &&
-          anchors?.length &&
-          anchors.map((anchor) => (
-            <TreeBranch
-              changeActiveItem={changeActiveItem}
-              changeBranchView={changeBranchView}
-              active={active}
-              opennedBranches={opennedBranches}
-              data={data}
-              key={anchor}
-              page={data.entities.anchors[anchor]}
-            />
-          ))}
-      </div>
+      {opennedBranches.includes(id) && (
+        <div className="item__list">
+          {pages?.length &&
+            pages.map((page) => (
+              <TreeBranch
+                changeActiveItem={changeActiveItem}
+                changeBranchView={changeBranchView}
+                active={active}
+                opennedBranches={opennedBranches}
+                data={data}
+                key={page}
+                handleKeyboard={handleKeyboard}
+                page={data.entities.pages[page]}
+              />
+            ))}
+          {isActive &&
+            anchors?.length &&
+            anchors.map((anchor) => (
+              <TreeBranch
+                changeActiveItem={changeActiveItem}
+                changeBranchView={changeBranchView}
+                active={active}
+                handleKeyboard={handleKeyboard}
+                opennedBranches={opennedBranches}
+                data={data}
+                key={anchor}
+                page={data.entities.anchors[anchor]}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 };
-export default TreeBranch;
+export default React.memo(TreeBranch);
