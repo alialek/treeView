@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
-import TreeBranch from "./TreeBranch";
+import React, { useState, useEffect, useCallback } from "react";
+import TreeBranch from "./TreeBranch.js";
 import TreeLoading from "./TreeLoading";
+import TreeSearch from "./TreeSearch";
 
 export default function TreeView({
-  data,
+  anchors,
+  topLevelIds,
+  pages,
   isLoading,
   error,
   onPageSelect,
@@ -12,44 +15,48 @@ export default function TreeView({
   const [opennedBranches, setOpennedBranches] = useState([]);
   const [active, setActive] = useState(null);
   const [search, setSearch] = useState("");
-  const [searchTree, setSearchTree] = useState({});
+  const [searchAnchors, setSearchAnchors] = useState({});
+  const [searchPages, setSearchPages] = useState({});
+  const [searchTopLevelIds, setSearchTopLevelIds] = useState([]);
+  const [isResultShown, setIsResultShown] = useState(false);
 
   useEffect(() => {
-    setActive(initialID);
-    if (data) {
-      setOpennedBranches((prevState) => [...prevState, initialID]);
+    if (initialID && pages) {
+      changeActiveItem(initialID);
       let id = initialID;
-
-      while (data.entities.pages[id].parentId) {
-        id = data.entities.pages[id].parentId;
-        setOpennedBranches((prevState) => [...prevState, id]);
+      const opennedIds = [];
+      while (pages[id].parentId) {
+        opennedIds.push(pages[id].parentId);
+        id = pages[id].parentId;
       }
+      setOpennedBranches((prevState) => [...prevState, ...opennedIds]);
     }
-  }, [initialID, data]);
+  }, [initialID, pages]);
 
-  const updateSearch = (e) => {
-    setSearch(e.target.value);
-    if (e.target.value.length >= 3) {
-      let newData = { entities: { pages: {}, anchors: {} }, topLevelIds: [] };
-      Object.keys(data.entities.pages).forEach((page) => {
-        if (
-          data.entities.pages[page].title
-            .toLowerCase()
-            .includes(e.target.value.toLowerCase())
-        ) {
-          while (data.entities.pages[page] && !newData.entities.pages[page]) {
-            newData.entities.pages[page] = data.entities.pages[page];
+  const updateSearch = (bool, value) => {
+    setIsResultShown(bool);
+    console.log(bool);
+    if (bool) {
+      const newPages = {};
+      const newAnchors = {};
+      const newTopLevelIds = [];
+      Object.keys(pages).forEach((page) => {
+        if (pages[page].title.toLowerCase().includes(value.toLowerCase())) {
+          while (pages[page] && !newPages[page]) {
+            newPages[page] = pages[page];
 
-            if (data.entities.pages[page].level === 0) {
-              newData.topLevelIds.push(data.entities.pages[page].id);
+            if (pages[page].level === 0) {
+              newTopLevelIds.push(pages[page].id);
             }
 
-            page = data.entities.pages[page].parentId;
+            page = pages[page].parentId;
           }
         }
       });
-      console.log(newData);
-      setSearchTree(newData);
+      console.log(newTopLevelIds, newPages, newAnchors);
+      setSearchTopLevelIds(newTopLevelIds);
+      setSearchPages(newPages);
+      setSearchAnchors(newAnchors);
     }
   };
 
@@ -68,38 +75,49 @@ export default function TreeView({
     }
   };
 
-  const changeBranchView = (id) => {
-    const branchIndex = opennedBranches.indexOf(id);
-    if (branchIndex === -1) {
-      setOpennedBranches((prevState) => [...prevState, id]);
-      return;
-    }
+  const changeBranchView = useCallback(
+    (id) => {
+      if (pages) console.log("here2", pages[id]);
+      const branchIndex = opennedBranches.indexOf(id);
+      if (branchIndex === -1) {
+        setOpennedBranches((prevState) => [...prevState, id]);
+        return;
+      }
 
-    setOpennedBranches((prevState) => [
-      ...prevState.slice(0, branchIndex),
-      ...prevState.slice(branchIndex + 1, prevState.length),
-    ]);
-  };
+      setOpennedBranches((prevState) => [
+        ...prevState.slice(0, branchIndex),
+        ...prevState.slice(branchIndex + 1, prevState.length),
+      ]);
+    },
+    [opennedBranches],
+  );
 
-  const changeActiveItem = (id) => {
-    if (id === active) {
-      return setActive(null);
-    }
-    setActive(id);
-    onPageSelect(id);
-    if (!opennedBranches.includes(id)) {
-      changeBranchView(id);
-    }
-  };
+  const changeActiveItem = useCallback(
+    (id) => {
+      if (id === active) {
+        return setActive(null);
+      }
+      console.log("here", id);
+      setActive(id);
+      onPageSelect(id);
+      if (!opennedBranches.includes(id)) {
+        changeBranchView(id);
+      }
+    },
+    [active],
+  );
   return (
     <div className="treeview">
       {isLoading && <TreeLoading />}
       {error && <div>{error}</div>}
-      {data && (
+      {topLevelIds && (
         <div>
-          <input onChange={updateSearch} value={search} />
-          {search.length < 3 &&
-            data.topLevelIds.map((id) => (
+          <TreeSearch
+            onShowResult={(bool, searchText) => updateSearch(bool, searchText)}
+            value={search}
+          />
+          {!isResultShown &&
+            topLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
                 setActive={setActive}
@@ -107,14 +125,14 @@ export default function TreeView({
                 active={active}
                 opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
-                data={data}
+                allPages={pages}
+                allAnchors={anchors}
                 key={id}
-                page={data.entities.pages[id]}
+                page={pages[id]}
               />
             ))}{" "}
-          {search.length >= 3 && searchTree.topLevelIds.toString()}
-          {search.length >= 3 &&
-            searchTree.topLevelIds.map((id) => (
+          {isResultShown &&
+            searchTopLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
                 setActive={setActive}
@@ -122,9 +140,10 @@ export default function TreeView({
                 active={active}
                 opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
-                data={searchTree}
+                allPages={searchPages}
+                allAnchors={searchAnchors}
                 key={id}
-                page={searchTree.entities.pages[id]}
+                page={searchPages[id]}
               />
             ))}
         </div>

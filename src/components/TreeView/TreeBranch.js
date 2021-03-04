@@ -3,18 +3,18 @@ import { StoreContext } from "./TreeContext";
 
 const TreeBranch = ({
   page,
-  data,
+  allPages,
+  allAnchors,
   active,
   opennedBranches,
   changeActiveItem,
   changeBranchView,
   handleKeyboard,
 }) => {
-  console.log(page.id);
-  const { id, title, url, level, parentId, pages, anchors } = page;
-  const isLeaf = useMemo(() => !pages?.length, [pages]);
-  const isActive = useMemo(() => id === active, [id, active]);
-
+  console.log(page);
+  const { id, title, url, level, pages, anchors } = page;
+  const isLeaf = !pages?.length;
+  const isActive = id === active;
   return (
     <div
       className={`treeview__block ${isActive ? "treeview__block--active" : ""}`}
@@ -50,18 +50,22 @@ const TreeBranch = ({
       {opennedBranches.includes(id) && (
         <div className="item__list">
           {pages?.length &&
-            pages.map((page) => (
-              <TreeBranch
-                changeActiveItem={changeActiveItem}
-                changeBranchView={changeBranchView}
-                active={active}
-                opennedBranches={opennedBranches}
-                data={data}
-                key={page}
-                handleKeyboard={handleKeyboard}
-                page={data.entities.pages[page]}
-              />
-            ))}
+            pages.map(
+              (page) =>
+                allPages[page] && (
+                  <TreeBranch
+                    changeActiveItem={changeActiveItem}
+                    changeBranchView={changeBranchView}
+                    active={active}
+                    opennedBranches={opennedBranches}
+                    allPages={allPages}
+                    allAnchors={allAnchors}
+                    key={page}
+                    handleKeyboard={handleKeyboard}
+                    page={allPages[page]}
+                  />
+                ),
+            )}
           {isActive &&
             anchors?.length &&
             anchors.map((anchor) => (
@@ -71,9 +75,10 @@ const TreeBranch = ({
                 active={active}
                 handleKeyboard={handleKeyboard}
                 opennedBranches={opennedBranches}
-                data={data}
+                allPages={allPages}
+                allAnchors={allAnchors}
                 key={anchor}
-                page={data.entities.anchors[anchor]}
+                page={allAnchors[anchor]}
               />
             ))}
         </div>

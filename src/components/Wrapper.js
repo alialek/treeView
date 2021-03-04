@@ -9,7 +9,9 @@ export default function Wrapper() {
   return (
     <div>
       <TreeView
-        data={response}
+        topLevelIds={response?.topLevelIds}
+        pages={response?.entities.pages}
+        anchors={response?.entities.anchors}
         error={error}
         isLoading={isLoading}
         onPageSelect={onPageSelect}
