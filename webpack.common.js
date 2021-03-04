@@ -11,6 +11,17 @@ module.exports = {
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                targets: {
+                  esmodules: true,
+                },
+              },
+            ],
+            "@babel/preset-react",
+          ],
         },
       },
 
