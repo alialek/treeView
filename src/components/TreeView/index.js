@@ -12,40 +12,59 @@ export default function TreeView({
   onPageSelect,
   initialID,
   initialSearch,
+  initialAnchor,
 }) {
   const [openedBranches, setOpenedBranches] = useState([]);
   const [activePage, setActivePage] = useState(null);
-  const [searchAnchors, setSearchAnchors] = useState({});
+  const [activeAnchor, setActiveAnchor] = useState(null);
   const [searchPages, setSearchPages] = useState({});
   const [searchTopLevelIds, setSearchTopLevelIds] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  const updateSearch = (search) => {
-    if (search) {
-      const newPages = {};
-      const newAnchors = {};
-      const newTopLevelIds = [];
+  const updateSearch = useCallback(
+    (search) => {
+      if (search) {
+        const newPages = {};
+        const newTopLevelIds = [];
+        const openedIds = [];
 
-      Object.keys(pages).forEach((page) => {
-        if (pages[page].title.toLowerCase().includes(search.toLowerCase())) {
-          while (pages[page] && !newPages[page]) {
-            newPages[page] = pages[page];
-            if (pages[page].level === 0) {
-              newTopLevelIds.push(pages[page].id);
+        Object.keys(pages).forEach((page) => {
+          if (pages[page].title.toLowerCase().includes(search.toLowerCase())) {
+            while (pages[page] && !newPages[page]) {
+              newPages[page] = pages[page];
+              if (pages[page].level === 0) {
+                newTopLevelIds.push(pages[page].id);
+              }
+
+              openedIds.push(page);
+
+              page = pages[page].parentId;
             }
-            page = pages[page].parentId;
           }
-        }
-      });
+        });
+        setOpenedBranches(openedIds);
+        setSearchTopLevelIds(newTopLevelIds);
+        setSearchPages(newPages);
+        setShowSearchResults(true);
+      } else {
+        setShowSearchResults(false);
+      }
+    },
+    [pages],
+  );
 
-      setSearchTopLevelIds(newTopLevelIds);
-      setSearchPages(newPages);
-      setSearchAnchors(newAnchors);
-      setShowSearchResults(true);
-    } else {
-      setShowSearchResults(false);
-    }
-  };
+  const drawTreeById = useCallback(
+    (id) => {
+      changeActiveItem(id);
+      const openedIds = [];
+      while (pages[id].parentId) {
+        openedIds.push(pages[id].parentId);
+        id = pages[id].parentId;
+      }
+      setOpenedBranches((prevState) => [...prevState, ...openedIds]);
+    },
+    [changeActiveItem, pages],
+  );
 
   const changeBranchView = useCallback(
     (id) => {
@@ -70,14 +89,16 @@ export default function TreeView({
         if (id === activePage) {
           return setActivePage(null);
         }
-        setActivePage(id);
-        if (!openedBranches.includes(id) && !isAnchor) {
+        if (!openedBranches.includes(id)) {
           changeBranchView(id);
         }
+        setActivePage(id);
+      } else {
+        setActiveAnchor(id);
       }
       onPageSelect(isAnchor, url, anchor);
     },
-    [activePage, changeBranchView, onPageSelect, openedBranches],
+    [changeBranchView, openedBranches],
   );
   const handleKeyboard = useCallback(
     (id, e) => {
@@ -99,16 +120,16 @@ export default function TreeView({
 
   useEffect(() => {
     if (initialID && pages) {
-      changeActiveItem(initialID);
-      let id = initialID;
-      const openedIds = [];
-      while (pages[id].parentId) {
-        openedIds.push(pages[id].parentId);
-        id = pages[id].parentId;
-      }
-      setOpenedBranches((prevState) => [...prevState, ...openedIds]);
+      drawTreeById(initialID);
     }
-  }, [initialID, pages]);
+  }, [initialID, pages, drawTreeById]);
+
+  useEffect(() => {
+    if (initialAnchor && anchors) {
+      setActiveAnchor(initialAnchor);
+      drawTreeById(anchors[initialAnchor].parentId);
+    }
+  }, [initialAnchor, anchors, drawTreeById]);
 
   return (
     <div className="treeview">
@@ -124,14 +145,15 @@ export default function TreeView({
             topLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
-                setActive={setActivePage}
                 changeBranchView={changeBranchView}
+                setActive={setActivePage}
                 handleKeyboard={handleKeyboard}
                 allPages={pages}
                 allAnchors={anchors}
                 key={id}
                 page={pages[id]}
                 activePage={activePage}
+                activeAnchor={activeAnchor}
                 openedBranches={openedBranches}
               />
             ))}{" "}
@@ -143,10 +165,11 @@ export default function TreeView({
                 setActive={setActivePage}
                 handleKeyboard={handleKeyboard}
                 allPages={searchPages}
-                allAnchors={searchAnchors}
+                allAnchors={anchors}
                 key={id}
                 page={searchPages[id]}
                 activePage={activePage}
+                activeAnchor={activeAnchor}
                 openedBranches={openedBranches}
               />
             ))}

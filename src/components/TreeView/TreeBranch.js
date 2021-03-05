@@ -11,11 +11,14 @@ const TreeBranch = ({
   parentLevel,
   activePage,
   openedBranches,
+  activeAnchor,
 }) => {
   const { id, title, url, level, pages, anchors, anchor } = page;
+
   const isLeaf = !pages?.length;
-  const isActive = id === activePage;
+  const isActive = id === activePage || id === activeAnchor;
   const isBranchOpened = openedBranches.includes(id);
+
   const componentProps = {
     changeActiveItem,
     changeBranchView,
@@ -23,6 +26,7 @@ const TreeBranch = ({
     allPages,
     allAnchors,
     activePage,
+    activeAnchor,
     openedBranches,
   };
   return (
