@@ -92,6 +92,7 @@ html {
     display: block;
     transition: transform 0.2s;
     cursor: pointer;
+    user-select: none;
   }
 
   &__title--active {
