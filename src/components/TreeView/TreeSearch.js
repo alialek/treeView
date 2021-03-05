@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from "react";
 import useDebounce from "./../../hooks/useDebounce";
+import { PropTypes } from "prop-types";
 
-export default function TreeSearch({ onShowResult, initialSearch }) {
-  const [search, setSearch] = useState("");
+function TreeSearch({ onShowResult, initialSearch = "" }) {
+  const [search, setSearch] = useState(initialSearch);
 
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
-    onShowResult(search);
-  }, [debouncedSearch]);
-
-  useEffect(() => {
-    if (initialSearch) {
-      setSearch(initialSearch);
-    }
-  }, [initialSearch]);
+    onShowResult(debouncedSearch);
+  }, [debouncedSearch, onShowResult]);
 
   const updateSearch = (e) => {
     setSearch(e.target.value);
@@ -25,3 +20,10 @@ export default function TreeSearch({ onShowResult, initialSearch }) {
     </div>
   );
 }
+
+TreeSearch.propTypes = {
+  initialSearch: PropTypes.string,
+  onShowResult: PropTypes.func,
+};
+
+export default TreeSearch;

@@ -1,4 +1,5 @@
 import React from "react";
+import { PropTypes } from "prop-types";
 
 const TreeBranch = ({
   page,
@@ -90,4 +91,19 @@ const TreeBranch = ({
     </div>
   );
 };
+
+TreeBranch.propTypes = {
+  page: PropTypes.object,
+  allPages: PropTypes.object,
+  allAnchors: PropTypes.object,
+  changeActiveItem: PropTypes.func,
+  changeBranchView: PropTypes.func,
+  handleKeyboard: PropTypes.func,
+  isAnchor: PropTypes.bool,
+  parentLevel: PropTypes.number,
+  activePage: PropTypes.string,
+  openedBranches: PropTypes.array,
+  activeAnchor: PropTypes.string,
+};
+
 export default React.memo(TreeBranch);

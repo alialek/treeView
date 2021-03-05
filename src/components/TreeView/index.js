@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { PropTypes } from "prop-types";
 import TreeBranch from "./TreeBranch.js";
 import TreeLoading from "./TreeLoading";
 import TreeSearch from "./TreeSearch";
@@ -138,7 +139,7 @@ export default function TreeView({
         <>
           <TreeSearch
             initialSearch={initialSearch}
-            onShowResult={(searchText) => updateSearch(searchText)}
+            onShowResult={updateSearch}
           />
           {!showSearchResults &&
             topLevelIds.map((id) => (
@@ -156,24 +157,45 @@ export default function TreeView({
                 openedBranches={openedBranches}
               />
             ))}{" "}
-          {showSearchResults &&
-            searchTopLevelIds.map((id) => (
-              <TreeBranch
-                changeActiveItem={changeActiveItem}
-                changeBranchView={changeBranchView}
-                setActive={setActivePage}
-                handleKeyboard={handleKeyboard}
-                allPages={searchPages}
-                allAnchors={anchors}
-                key={id}
-                page={searchPages[id]}
-                activePage={activePage}
-                activeAnchor={activeAnchor}
-                openedBranches={openedBranches}
-              />
-            ))}
+          {showSearchResults && (
+            <>
+              {searchTopLevelIds.length === 0 && (
+                <div className="item-level-0 item__wrapper ">
+                  Ничего не найдено
+                </div>
+              )}
+              {searchTopLevelIds.length > 0 &&
+                searchTopLevelIds.map((id) => (
+                  <TreeBranch
+                    changeActiveItem={changeActiveItem}
+                    changeBranchView={changeBranchView}
+                    setActive={setActivePage}
+                    handleKeyboard={handleKeyboard}
+                    allPages={searchPages}
+                    allAnchors={anchors}
+                    key={id}
+                    page={searchPages[id]}
+                    activePage={activePage}
+                    activeAnchor={activeAnchor}
+                    openedBranches={openedBranches}
+                  />
+                ))}
+            </>
+          )}
         </>
       )}
     </div>
   );
 }
+
+TreeView.propTypes = {
+  anchors: PropTypes.object,
+  topLevelIds: PropTypes.array,
+  pages: PropTypes.object,
+  isLoading: PropTypes.bool,
+  error: PropTypes.string,
+  onPageSelect: PropTypes.func,
+  initialID: PropTypes.string,
+  initialSearch: PropTypes.string,
+  initialAnchor: PropTypes.string,
+};
