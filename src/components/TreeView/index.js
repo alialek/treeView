@@ -11,6 +11,7 @@ export default function TreeView({
   error,
   onPageSelect,
   initialID,
+  initialSearch,
 }) {
   const [openedBranches, setOpenedBranches] = useState([]);
   const [activePage, setActivePage] = useState(null);
@@ -18,11 +19,6 @@ export default function TreeView({
   const [searchPages, setSearchPages] = useState({});
   const [searchTopLevelIds, setSearchTopLevelIds] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
-
-  const isActive = useCallback((id) => id === activePage, [activePage]);
-  const isBranchOpened = useCallback((id) => openedBranches.includes(id), [
-    openedBranches,
-  ]);
 
   const updateSearch = (search) => {
     if (search) {
@@ -69,7 +65,7 @@ export default function TreeView({
   );
 
   const changeActiveItem = useCallback(
-    (id, isAnchor) => {
+    (id, isAnchor, url, anchor) => {
       if (!isAnchor) {
         if (id === activePage) {
           return setActivePage(null);
@@ -79,8 +75,7 @@ export default function TreeView({
           changeBranchView(id);
         }
       }
-      console.log(isAnchor);
-      onPageSelect(id);
+      onPageSelect(isAnchor, url, anchor);
     },
     [activePage, changeBranchView, onPageSelect, openedBranches],
   );
@@ -101,6 +96,7 @@ export default function TreeView({
     },
     [changeBranchView, changeActiveItem],
   );
+
   useEffect(() => {
     if (initialID && pages) {
       changeActiveItem(initialID);
@@ -112,14 +108,18 @@ export default function TreeView({
       }
       setOpenedBranches((prevState) => [...prevState, ...openedIds]);
     }
-  }, [changeActiveItem, initialID, pages]);
+  }, [initialID, pages]);
+
   return (
     <div className="treeview">
       {isLoading && <TreeLoading />}
       {error && <div>{error}</div>}
       {topLevelIds && (
-        <div>
-          <TreeSearch onShowResult={(searchText) => updateSearch(searchText)} />
+        <>
+          <TreeSearch
+            initialSearch={initialSearch}
+            onShowResult={(searchText) => updateSearch(searchText)}
+          />
           {!showSearchResults &&
             topLevelIds.map((id) => (
               <TreeBranch
@@ -131,8 +131,8 @@ export default function TreeView({
                 allAnchors={anchors}
                 key={id}
                 page={pages[id]}
-                isActive={isActive}
-                isBranchOpened={isBranchOpened}
+                activePage={activePage}
+                openedBranches={openedBranches}
               />
             ))}{" "}
           {showSearchResults &&
@@ -146,11 +146,11 @@ export default function TreeView({
                 allAnchors={searchAnchors}
                 key={id}
                 page={searchPages[id]}
-                isActive={isActive}
-                isBranchOpened={isBranchOpened}
+                activePage={activePage}
+                openedBranches={openedBranches}
               />
             ))}
-        </div>
+        </>
       )}
     </div>
   );

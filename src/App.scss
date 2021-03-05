@@ -19,9 +19,17 @@ html {
   font-family: sans-serif;
 }
 
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .treeview {
   padding: 24px 0;
   width: 280px;
+
+  input {
+    height: 20px;
+  }
 
   &__loading {
     margin: 0 20px;
@@ -65,6 +73,7 @@ html {
 
   &__block--active {
     background-color: rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
   }
 }
 

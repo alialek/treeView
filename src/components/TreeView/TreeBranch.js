@@ -9,28 +9,28 @@ const TreeBranch = ({
   handleKeyboard,
   isAnchor,
   parentLevel,
-  isActive,
-  isBranchOpenned,
+  activePage,
+  openedBranches,
 }) => {
-  const { id, title, url, level, pages, anchors } = page;
+  const { id, title, url, level, pages, anchors, anchor } = page;
   const isLeaf = !pages?.length;
+  const isActive = id === activePage;
+  const isBranchOpened = openedBranches.includes(id);
   const componentProps = {
     changeActiveItem,
     changeBranchView,
     handleKeyboard,
     allPages,
     allAnchors,
-    isActive,
-    isBranchOpenned,
+    activePage,
+    openedBranches,
   };
   return (
     <div
-      className={`treeview__block ${
-        isActive(id) ? "treeview__block--active" : ""
-      }`}
+      className={`treeview__block ${isActive ? "treeview__block--active" : ""}`}
     >
       <div
-        tabIndex="-1"
+        tabIndex="0"
         onKeyDown={(e) => handleKeyboard(id, e)}
         className={`treeview__item item`}
       >
@@ -43,23 +43,21 @@ const TreeBranch = ({
             <span
               onClick={() => changeBranchView(id)}
               className={`item__toggle ${
-                isBranchOpenned(id) && `item__toggle--active`
+                isBranchOpened && `item__toggle--active`
               }`}
             >
               ▸
             </span>
           )}
           <div
-            onClick={() => changeActiveItem(id, isAnchor)}
-            className={`item__title ${
-              isActive(id) ? "item__title--active" : ""
-            }`}
+            onClick={() => changeActiveItem(id, isAnchor, url, anchor)}
+            className={`item__title ${isActive ? "item__title--active" : ""}`}
           >
             {title}
           </div>
         </div>
       </div>
-      {isBranchOpenned(id) && (
+      {isBranchOpened && (
         <div className="item__list">
           {pages?.length &&
             pages.map(
@@ -72,7 +70,7 @@ const TreeBranch = ({
                   />
                 ),
             )}
-          {isActive(id) &&
+          {isActive &&
             anchors?.length &&
             anchors.map((anchor) => (
               <TreeBranch

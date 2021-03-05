@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 
-const useFetch = (url, options) => {
+const useFetch = (
+  url,
+  options = {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    mode: "no-cors",
+  },
+) => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
