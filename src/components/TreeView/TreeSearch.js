@@ -3,7 +3,6 @@ import useDebounce from "./../../hooks/useDebounce";
 
 export default function TreeSearch({ onShowResult }) {
   const [search, setSearch] = useState("");
-  const [isResultShown, setIsResultShown] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
 

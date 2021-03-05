@@ -12,7 +12,7 @@ export default function TreeView({
   onPageSelect,
   initialID,
 }) {
-  const [opennedBranches, setOpennedBranches] = useState([]);
+  const [openedBranches, setOpenedBranches] = useState([]);
   const [activePage, setActivePage] = useState(null);
   const [searchAnchors, setSearchAnchors] = useState({});
   const [searchPages, setSearchPages] = useState({});
@@ -20,8 +20,8 @@ export default function TreeView({
   const [showSearchResults, setShowSearchResults] = useState(false);
 
   const isActive = useCallback((id) => id === activePage, [activePage]);
-  const isBranchOpenned = useCallback((id) => opennedBranches.includes(id), [
-    opennedBranches,
+  const isBranchOpened = useCallback((id) => openedBranches.includes(id), [
+    openedBranches,
   ]);
 
   const updateSearch = (search) => {
@@ -53,19 +53,19 @@ export default function TreeView({
 
   const changeBranchView = useCallback(
     (id) => {
-      const branchIndex = opennedBranches.indexOf(id);
+      const branchIndex = openedBranches.indexOf(id);
 
       if (branchIndex === -1) {
-        setOpennedBranches((prevState) => [...prevState, id]);
+        setOpenedBranches((prevState) => [...prevState, id]);
         return;
       }
 
-      setOpennedBranches((prevState) => [
+      setOpenedBranches((prevState) => [
         ...prevState.slice(0, branchIndex),
         ...prevState.slice(branchIndex + 1, prevState.length),
       ]);
     },
-    [opennedBranches],
+    [openedBranches],
   );
 
   const changeActiveItem = useCallback(
@@ -75,14 +75,14 @@ export default function TreeView({
           return setActivePage(null);
         }
         setActivePage(id);
-        if (!opennedBranches.includes(id) && !isAnchor) {
+        if (!openedBranches.includes(id) && !isAnchor) {
           changeBranchView(id);
         }
       }
       console.log(isAnchor);
       onPageSelect(id);
     },
-    [activePage, changeBranchView, onPageSelect, opennedBranches],
+    [activePage, changeBranchView, onPageSelect, openedBranches],
   );
   const handleKeyboard = useCallback(
     (id, e) => {
@@ -105,12 +105,12 @@ export default function TreeView({
     if (initialID && pages) {
       changeActiveItem(initialID);
       let id = initialID;
-      const opennedIds = [];
+      const openedIds = [];
       while (pages[id].parentId) {
-        opennedIds.push(pages[id].parentId);
+        openedIds.push(pages[id].parentId);
         id = pages[id].parentId;
       }
-      setOpennedBranches((prevState) => [...prevState, ...opennedIds]);
+      setOpenedBranches((prevState) => [...prevState, ...openedIds]);
     }
   }, [changeActiveItem, initialID, pages]);
   return (
@@ -132,7 +132,7 @@ export default function TreeView({
                 key={id}
                 page={pages[id]}
                 isActive={isActive}
-                isBranchOpenned={isBranchOpenned}
+                isBranchOpened={isBranchOpened}
               />
             ))}{" "}
           {showSearchResults &&
@@ -147,7 +147,7 @@ export default function TreeView({
                 key={id}
                 page={searchPages[id]}
                 isActive={isActive}
-                isBranchOpenned={isBranchOpenned}
+                isBranchOpened={isBranchOpened}
               />
             ))}
         </div>

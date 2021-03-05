@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import { StoreContext } from "./TreeContext";
+import React from "react";
 
 const TreeBranch = ({
   page,
