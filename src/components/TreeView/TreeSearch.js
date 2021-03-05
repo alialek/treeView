@@ -8,20 +8,11 @@ export default function TreeSearch({ onShowResult }) {
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
-    if (debouncedSearch) {
-      onShowResult(true, search);
-    }
-  }, [debouncedSearch, onShowResult]);
+    onShowResult(search);
+  }, [debouncedSearch]);
 
   const updateSearch = (e) => {
     setSearch(e.target.value);
-    if (e.target.value.length >= 3) {
-      setIsResultShown(true);
-      onShowResult(true, e.target.value);
-    } else {
-      setIsResultShown(false);
-      onShowResult(false, e.target.value);
-    }
   };
   return (
     <div>

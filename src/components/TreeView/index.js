@@ -14,34 +14,24 @@ export default function TreeView({
 }) {
   const [opennedBranches, setOpennedBranches] = useState([]);
   const [activePage, setActivePage] = useState(null);
-  const [search, setSearch] = useState("");
   const [searchAnchors, setSearchAnchors] = useState({});
   const [searchPages, setSearchPages] = useState({});
   const [searchTopLevelIds, setSearchTopLevelIds] = useState([]);
-  const [isResultShown, setIsResultShown] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
-  useEffect(() => {
-    if (initialID && pages) {
-      changeActiveItem(initialID);
-      let id = initialID;
-      const opennedIds = [];
-      while (pages[id].parentId) {
-        opennedIds.push(pages[id].parentId);
-        id = pages[id].parentId;
-      }
-      setOpennedBranches((prevState) => [...prevState, ...opennedIds]);
-    }
-  }, [initialID, pages]);
+  const isActive = useCallback((id) => id === activePage, [activePage]);
+  const isBranchOpenned = useCallback((id) => opennedBranches.includes(id), [
+    opennedBranches,
+  ]);
 
-  const updateSearch = (bool, value) => {
-    setIsResultShown(bool);
-    if (bool) {
+  const updateSearch = (search) => {
+    if (search) {
       const newPages = {};
       const newAnchors = {};
       const newTopLevelIds = [];
 
       Object.keys(pages).forEach((page) => {
-        if (pages[page].title.toLowerCase().includes(value.toLowerCase())) {
+        if (pages[page].title.toLowerCase().includes(search.toLowerCase())) {
           while (pages[page] && !newPages[page]) {
             newPages[page] = pages[page];
             if (pages[page].level === 0) {
@@ -55,28 +45,16 @@ export default function TreeView({
       setSearchTopLevelIds(newTopLevelIds);
       setSearchPages(newPages);
       setSearchAnchors(newAnchors);
-    }
-  };
-
-  const handleKeyboard = (id, e) => {
-    switch (e.keyCode) {
-      case 32:
-        changeBranchView(id);
-        break;
-
-      case 13:
-        changeActiveItem(id);
-        break;
-
-      default:
-        break;
+      setShowSearchResults(true);
+    } else {
+      setShowSearchResults(false);
     }
   };
 
   const changeBranchView = useCallback(
     (id) => {
-      if (pages) console.log("here2", pages[id]);
       const branchIndex = opennedBranches.indexOf(id);
+
       if (branchIndex === -1) {
         setOpennedBranches((prevState) => [...prevState, id]);
         return;
@@ -87,7 +65,7 @@ export default function TreeView({
         ...prevState.slice(branchIndex + 1, prevState.length),
       ]);
     },
-    [opennedBranches, pages],
+    [opennedBranches],
   );
 
   const changeActiveItem = useCallback(
@@ -104,46 +82,72 @@ export default function TreeView({
       console.log(isAnchor);
       onPageSelect(id);
     },
-    [activePage],
+    [activePage, changeBranchView, onPageSelect, opennedBranches],
   );
+  const handleKeyboard = useCallback(
+    (id, e) => {
+      switch (e.keyCode) {
+        case 32:
+          changeBranchView(id);
+          break;
+
+        case 13:
+          changeActiveItem(id);
+          break;
+
+        default:
+          break;
+      }
+    },
+    [changeBranchView, changeActiveItem],
+  );
+  useEffect(() => {
+    if (initialID && pages) {
+      changeActiveItem(initialID);
+      let id = initialID;
+      const opennedIds = [];
+      while (pages[id].parentId) {
+        opennedIds.push(pages[id].parentId);
+        id = pages[id].parentId;
+      }
+      setOpennedBranches((prevState) => [...prevState, ...opennedIds]);
+    }
+  }, [changeActiveItem, initialID, pages]);
   return (
     <div className="treeview">
       {isLoading && <TreeLoading />}
       {error && <div>{error}</div>}
       {topLevelIds && (
         <div>
-          <TreeSearch
-            onShowResult={(bool, searchText) => updateSearch(bool, searchText)}
-            value={search}
-          />
-          {!isResultShown &&
+          <TreeSearch onShowResult={(searchText) => updateSearch(searchText)} />
+          {!showSearchResults &&
             topLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
                 setActive={setActivePage}
                 changeBranchView={changeBranchView}
-                active={activePage}
-                opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
                 allPages={pages}
                 allAnchors={anchors}
                 key={id}
                 page={pages[id]}
+                isActive={isActive}
+                isBranchOpenned={isBranchOpenned}
               />
             ))}{" "}
-          {isResultShown &&
+          {showSearchResults &&
             searchTopLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
                 changeBranchView={changeBranchView}
                 setActive={setActivePage}
-                active={activePage}
-                opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
                 allPages={searchPages}
                 allAnchors={searchAnchors}
                 key={id}
                 page={searchPages[id]}
+                isActive={isActive}
+                isBranchOpenned={isBranchOpenned}
               />
             ))}
         </div>
