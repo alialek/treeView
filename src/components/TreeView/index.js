@@ -13,7 +13,7 @@ export default function TreeView({
   initialID,
 }) {
   const [opennedBranches, setOpennedBranches] = useState([]);
-  const [active, setActive] = useState(null);
+  const [activePage, setActivePage] = useState(null);
   const [search, setSearch] = useState("");
   const [searchAnchors, setSearchAnchors] = useState({});
   const [searchPages, setSearchPages] = useState({});
@@ -35,25 +35,23 @@ export default function TreeView({
 
   const updateSearch = (bool, value) => {
     setIsResultShown(bool);
-    console.log(bool);
     if (bool) {
       const newPages = {};
       const newAnchors = {};
       const newTopLevelIds = [];
+
       Object.keys(pages).forEach((page) => {
         if (pages[page].title.toLowerCase().includes(value.toLowerCase())) {
           while (pages[page] && !newPages[page]) {
             newPages[page] = pages[page];
-
             if (pages[page].level === 0) {
               newTopLevelIds.push(pages[page].id);
             }
-
             page = pages[page].parentId;
           }
         }
       });
-      console.log(newTopLevelIds, newPages, newAnchors);
+
       setSearchTopLevelIds(newTopLevelIds);
       setSearchPages(newPages);
       setSearchAnchors(newAnchors);
@@ -89,22 +87,24 @@ export default function TreeView({
         ...prevState.slice(branchIndex + 1, prevState.length),
       ]);
     },
-    [opennedBranches],
+    [opennedBranches, pages],
   );
 
   const changeActiveItem = useCallback(
-    (id) => {
-      if (id === active) {
-        return setActive(null);
+    (id, isAnchor) => {
+      if (!isAnchor) {
+        if (id === activePage) {
+          return setActivePage(null);
+        }
+        setActivePage(id);
+        if (!opennedBranches.includes(id) && !isAnchor) {
+          changeBranchView(id);
+        }
       }
-      console.log("here", id);
-      setActive(id);
+      console.log(isAnchor);
       onPageSelect(id);
-      if (!opennedBranches.includes(id)) {
-        changeBranchView(id);
-      }
     },
-    [active],
+    [activePage],
   );
   return (
     <div className="treeview">
@@ -120,9 +120,9 @@ export default function TreeView({
             topLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
-                setActive={setActive}
+                setActive={setActivePage}
                 changeBranchView={changeBranchView}
-                active={active}
+                active={activePage}
                 opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
                 allPages={pages}
@@ -135,9 +135,9 @@ export default function TreeView({
             searchTopLevelIds.map((id) => (
               <TreeBranch
                 changeActiveItem={changeActiveItem}
-                setActive={setActive}
                 changeBranchView={changeBranchView}
-                active={active}
+                setActive={setActivePage}
+                active={activePage}
                 opennedBranches={opennedBranches}
                 handleKeyboard={handleKeyboard}
                 allPages={searchPages}

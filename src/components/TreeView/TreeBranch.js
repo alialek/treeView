@@ -10,8 +10,9 @@ const TreeBranch = ({
   changeActiveItem,
   changeBranchView,
   handleKeyboard,
+  isAnchor,
+  parentLevel,
 }) => {
-  console.log(page);
   const { id, title, url, level, pages, anchors } = page;
   const isLeaf = !pages?.length;
   const isActive = id === active;
@@ -25,9 +26,9 @@ const TreeBranch = ({
         className={`treeview__item item`}
       >
         <div
-          className={`${
-            isLeaf ? "leaf" : "item"
-          }-level-${level} item__wrapper `}
+          className={`${isLeaf ? "leaf" : "item"}-level-${
+            isAnchor ? parentLevel + level : level
+          } item__wrapper `}
         >
           {!isLeaf && (
             <span
@@ -40,7 +41,7 @@ const TreeBranch = ({
             </span>
           )}
           <div
-            onClick={() => changeActiveItem(id)}
+            onClick={() => changeActiveItem(id, isAnchor)}
             className={`item__title ${isActive ? "item__title--active" : ""}`}
           >
             {title}
@@ -79,6 +80,8 @@ const TreeBranch = ({
                 allAnchors={allAnchors}
                 key={anchor}
                 page={allAnchors[anchor]}
+                isAnchor={true}
+                parentLevel={level}
               />
             ))}
         </div>
