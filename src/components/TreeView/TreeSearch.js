@@ -7,14 +7,14 @@ export default function TreeSearch({ onShowResult, initialSearch }) {
   const debouncedSearch = useDebounce(search, 500);
 
   useEffect(() => {
+    onShowResult(search);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
     if (initialSearch) {
       setSearch(initialSearch);
     }
-  }, []);
-
-  useEffect(() => {
-    onShowResult(search);
-  }, [debouncedSearch]);
+  }, [initialSearch]);
 
   const updateSearch = (e) => {
     setSearch(e.target.value);

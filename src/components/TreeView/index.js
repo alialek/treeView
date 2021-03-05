@@ -53,19 +53,6 @@ export default function TreeView({
     [pages],
   );
 
-  const drawTreeById = useCallback(
-    (id) => {
-      changeActiveItem(id);
-      const openedIds = [];
-      while (pages[id].parentId) {
-        openedIds.push(pages[id].parentId);
-        id = pages[id].parentId;
-      }
-      setOpenedBranches((prevState) => [...prevState, ...openedIds]);
-    },
-    [changeActiveItem, pages],
-  );
-
   const changeBranchView = useCallback(
     (id) => {
       const branchIndex = openedBranches.indexOf(id);
@@ -98,7 +85,7 @@ export default function TreeView({
       }
       onPageSelect(isAnchor, url, anchor);
     },
-    [changeBranchView, openedBranches],
+    [activePage, changeBranchView, onPageSelect, openedBranches],
   );
   const handleKeyboard = useCallback(
     (id, e) => {
@@ -117,6 +104,18 @@ export default function TreeView({
     },
     [changeBranchView, changeActiveItem],
   );
+  const drawTreeById = useCallback(
+    (id) => {
+      changeActiveItem(id);
+      const openedIds = [];
+      while (pages[id].parentId) {
+        openedIds.push(pages[id].parentId);
+        id = pages[id].parentId;
+      }
+      setOpenedBranches((prevState) => [...prevState, ...openedIds]);
+    },
+    [changeActiveItem, pages],
+  );
 
   useEffect(() => {
     if (initialID && pages) {
@@ -129,12 +128,12 @@ export default function TreeView({
       setActiveAnchor(initialAnchor);
       drawTreeById(anchors[initialAnchor].parentId);
     }
-  }, [initialAnchor, anchors, drawTreeById]);
+  }, [initialAnchor, drawTreeById, anchors]);
 
   return (
     <div className="treeview">
       {isLoading && <TreeLoading />}
-      {error && <div>{error}</div>}
+      {error && <div>Ошибка</div>}
       {topLevelIds && (
         <>
           <TreeSearch
