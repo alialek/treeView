@@ -1,6 +1,6 @@
 import React from "react";
 import { PropTypes } from "prop-types";
-import chevron from "../assets/chevron.svg";
+import chevron from "../../assets/chevron.svg";
 
 const TreeBranch = ({
   page,

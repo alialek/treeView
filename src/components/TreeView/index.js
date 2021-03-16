@@ -193,7 +193,7 @@ TreeView.propTypes = {
   topLevelIds: PropTypes.array,
   pages: PropTypes.object,
   isLoading: PropTypes.bool,
-  error: PropTypes.string,
+  error: PropTypes.object,
   onPageSelect: PropTypes.func,
   initialID: PropTypes.string,
   initialSearch: PropTypes.string,

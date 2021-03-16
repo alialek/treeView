@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "treeview",
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
@@ -9,7 +9,7 @@
     "react-scripts": "3.3.1"
   },
   "scripts": {
-    "start": "webpack-dev-server --config webpack.dev.js --open",
+    "start": "webpack serve --config webpack.dev.js --open",
     "build": "webpack --config webpack.prod.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -30,21 +30,22 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/preset-env": "^7.8.6",
-    "@babel/preset-react": "^7.8.3",
+    "@babel/core": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
+    "@babel/preset-react": "^7.12.13",
     "babel-loader": "^8.0.6",
-    "copy-webpack-plugin": "^6.3.2",
     "dotenv": "^8.2.0",
-    "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
+    "eslint": "^7.22.0",
+    "eslint-webpack-plugin": "^2.5.2",
+    "html-webpack-plugin": "^5.3.1",
     "node-sass": "^4.13.1",
+    "postcss-loader": "^3.0.0",
+    "postcss-preset-env": "^6.7.0",
     "react-devtools": "^4.10.1",
     "sass-loader": "^8.0.2",
-    "svg-url-loader": "^7.1.1",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
+    "webpack": "^5.26.2",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^4.2.2"
   }
 }

@@ -1,24 +1,29 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-const useFetch = (
-  url,
-  options = {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    mode: "no-cors",
-  },
-) => {
+const useFetch = (url) => {
+  const cache = useRef({});
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
-    fetch(url, options)
-      .then((res) => res.json())
-      .then((data) => setResponse(data))
-      .catch((err) => setError(err))
-      .finally(() => setIsLoading(false));
-  }, []);
+    if (cache.current[url]) {
+      const data = cache.current[url];
+      setResponse(data);
+    } else {
+      fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setResponse(data);
+          cache.current[url] = data;
+        })
+        .catch((err) => setError(err))
+        .finally(() => setIsLoading(false));
+    }
+  }, [url]);
   return { response, error, isLoading };
 };
 

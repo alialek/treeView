@@ -1,9 +1,10 @@
 import React from "react";
 import useFetch from "./../hooks/useFetch";
 import TreeView from "./TreeView/index";
+import tree from "../data/HelpTOC.json";
 
 export default function Wrapper() {
-  const { response, error, isLoading } = useFetch("/data/HelpTOC.json", {});
+  const { response, error, isLoading } = useFetch(tree);
   const onPageSelect = (isAnchor, url, anchor) =>
     console.log(
       `${isAnchor ? "Anchor" : "Page"} selected with url: ${url} ${
