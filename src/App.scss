@@ -1,7 +1,9 @@
 $levels: 0, 1, 2, 3, 4, 5, 6;
-$toggle_width: 12px;
-$line_width: 216px;
-$level_padding: 16px;
+$toggle_width: 8px;
+$line_width_long: 216px;
+$line_width_short: 178px;
+$level_padding: 20px;
+$tree_padding: 12px;
 
 @mixin nth-children($lines...) {
   @each $line in $lines {
@@ -16,7 +18,7 @@ body {
 }
 
 html {
-  font-family: sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 :focus:not(:focus-visible) {
@@ -32,37 +34,25 @@ html {
   }
 
   &__loading {
-    margin: 0 20px;
+    margin-left: 13px;
     border-radius: 4px;
     width: 100%;
 
     &--line {
-      height: 16px;
-      margin: $level_padding;
+      height: 13px;
+      margin: 15px 0;
       animation: pulse 1s infinite;
     }
 
     div {
-      @include nth-children(1, 9, 10) {
-        width: $line_width;
+      @include nth-children(3, 7) {
+        width: $line_width_short;
       }
-      @include nth-children(2, 3, 4) {
-        margin-left: #{$level_padding * 2};
+      @include nth-children(1, 2, 4, 5, 6, 8) {
+        width: $line_width_long;
       }
-      @include nth-children(5, 6, 7, 8) {
-        margin-left: #{$level_padding * 3};
-      }
-      @include nth-children(2, 4) {
-        width: #{$line_width * 0.8};
-      }
-      @include nth-children(3) {
-        width: #{$line_width * 0.9};
-      }
-      @include nth-children(5, 7) {
-        width: #{$line_width * 0.8};
-      }
-      @include nth-children(6, 8) {
-        width: #{$line_width * 0.7};
+      @include nth-children(2, 3, 4, 6, 7, 8) {
+        margin-left: 23px;
       }
     }
   }
@@ -71,13 +61,19 @@ html {
     animation: reveal 0.2s ease-in-out;
   }
 
+  &__block:last-child {
+    margin-bottom: 8px;
+  }
+
   &__block--active {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #f0f0f0;
     transition: background-color 0.2s;
   }
 }
 
 .item {
+  transition: text-decoration 0.2s;
+
   &__wrapper {
     padding-top: 8px;
     padding-bottom: 8px;
@@ -85,10 +81,9 @@ html {
   }
 
   &__toggle {
-    width: $toggle_width;
     height: 17px;
     font-size: 17px;
-    text-align: right;
+    text-align: center;
     display: block;
     transition: transform 0.2s;
     cursor: pointer;
@@ -98,9 +93,13 @@ html {
   &__title--active {
     font-weight: bold;
   }
+  &__toggle img {
+    vertical-align: middle;
+    transition: transform 0.2s;
+  }
 
-  &__toggle--active {
-    transform: rotate(90deg);
+  &__toggle--active img {
+    transform: rotate(180deg);
   }
   &__title {
     padding-left: 4px;
@@ -109,31 +108,30 @@ html {
 
   @each $level in $levels {
     &-level-#{$level} {
-      padding-left: #{$level * $level_padding + 32px};
+      padding-left: #{$level * $level_padding + $tree_padding};
     }
   }
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    transition: 0.2s;
+    text-decoration: underline;
   }
 }
 
 @each $level in $levels {
   .leaf-level-#{$level} {
-    padding-left: #{$level * 16px + 32px + $toggle_width};
+    padding-left: #{$level * $level_padding + $tree_padding + $toggle_width};
   }
 }
 
 @keyframes pulse {
   0% {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #ebebeb;
   }
   50% {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: #f0f0f0;
   }
   100% {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #ebebeb;
   }
 }
 

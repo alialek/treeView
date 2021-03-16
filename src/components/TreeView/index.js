@@ -135,7 +135,7 @@ export default function TreeView({
     <div className="treeview">
       {isLoading && <TreeLoading />}
       {error && <div>Ошибка</div>}
-      {topLevelIds && (
+      {!isLoading && !error && topLevelIds && (
         <>
           <TreeSearch
             initialSearch={initialSearch}

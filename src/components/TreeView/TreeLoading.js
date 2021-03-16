@@ -11,8 +11,6 @@ export default function TreeLoading() {
       <div className="treeview__loading--line"></div>
       <div className="treeview__loading--line"></div>
       <div className="treeview__loading--line"></div>
-      <div className="treeview__loading--line"></div>
-      <div className="treeview__loading--line"></div>
     </div>
   );
 }

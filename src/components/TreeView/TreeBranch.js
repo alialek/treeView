@@ -1,5 +1,6 @@
 import React from "react";
 import { PropTypes } from "prop-types";
+import chevron from "../assets/chevron.svg";
 
 const TreeBranch = ({
   page,
@@ -51,7 +52,7 @@ const TreeBranch = ({
                 isBranchOpened && `item__toggle--active`
               }`}
             >
-              ▸
+              <img src={chevron} alt="chevron" />
             </span>
           )}
           <div
